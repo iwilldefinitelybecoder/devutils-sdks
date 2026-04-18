@@ -65,10 +65,23 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           npm install -g wrangler
+
+          # Create deployment directory
           mkdir -p devutils_sdk/cdn/deploy
           cp devutils_sdk/cdn/dist/sdk.min.js devutils_sdk/cdn/deploy/sdk.min.js
           cp devutils_sdk/cdn/dist/sdk.esm.js devutils_sdk/cdn/deploy/sdk.esm.js
           cp devutils_sdk/cdn/dist/sdk.d.ts devutils_sdk/cdn/deploy/sdk.d.ts
+
+          # Create wrangler.toml for Pages
+          cat > devutils_sdk/wrangler.toml << 'EOF'
+          name = "devutils-sdk-cdn"
+          type = "javascript"
+
+          [env.production]
+          vars = { ENVIRONMENT = "production" }
+          EOF
+
+          # Deploy to Cloudflare Pages (auto-creates project if doesn't exist)
           wrangler pages deploy devutils_sdk/cdn/deploy \
             --project-name devutils-sdk-cdn \
             --branch main
