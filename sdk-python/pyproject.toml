@@ -47,9 +47,9 @@ dev = [
 
 [project.urls]
 Homepage = "https://devutils.in"
-Repository = "https://github.com/devutils/sdks"
+Repository = "https://github.com/iwilldefinitelybecoder/devutils-sdks"
 Documentation = "https://docs.devutils.in"
-Issues = "https://github.com/devutils/sdks/issues"
+Issues = "https://github.com/iwilldefinitelybecoder/devutils-sdks/issues"
 
 [tool.setuptools]
 packages = ["devutils_sdk"]

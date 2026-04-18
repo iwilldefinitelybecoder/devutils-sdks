@@ -8,10 +8,10 @@
   "homepage": "https://devutils.in",
   "repository": {
     "type": "git",
-    "url": "https://github.com/devutils/sdks"
+    "url": "https://github.com/iwilldefinitelybecoder/devutils-sdks"
   },
   "bugs": {
-    "url": "https://github.com/devutils/sdks/issues"
+    "url": "https://github.com/iwilldefinitelybecoder/devutils-sdks/issues"
   },
   "workspaces": [
     "sdk-js",
