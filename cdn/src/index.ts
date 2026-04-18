@@ -96,12 +96,7 @@ class DevUtilsError extends Error {
   statusCode: number;
   originalError?: Error;
 
-  constructor(
-    code: string,
-    message: string,
-    statusCode: number = 500,
-    originalError?: Error,
-  ) {
+  constructor(code: string, message: string, statusCode: number = 500, originalError?: Error) {
     super(message);
     this.code = code;
     this.statusCode = statusCode;
@@ -119,17 +114,9 @@ class DevUtilsError extends Error {
   }
 
   isRetryable(): boolean {
-    const retryableCodes = [
-      "TIMEOUT",
-      "RATE_LIMITED",
-      "SERVICE_UNAVAILABLE",
-      "TEMPORARY_ERROR",
-    ];
+    const retryableCodes = ["TIMEOUT", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "TEMPORARY_ERROR"];
     const retryableStatuses = [408, 429, 500, 502, 503, 504];
-    return (
-      retryableCodes.includes(this.code) ||
-      retryableStatuses.includes(this.statusCode)
-    );
+    return retryableCodes.includes(this.code) || retryableStatuses.includes(this.statusCode);
   }
 
   toJSON() {
@@ -158,9 +145,7 @@ class HttpClient {
     };
   }
 
-  private getHeaders(
-    customHeaders?: Record<string, string>,
-  ): Record<string, string> {
+  private getHeaders(customHeaders?: Record<string, string>): Record<string, string> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "User-Agent": "devutils-sdk-cdn/1.0.0",
@@ -177,7 +162,7 @@ class HttpClient {
     method: string,
     path: string,
     data?: any,
-    options?: { headers?: Record<string, string>; timeout?: number },
+    options?: { headers?: Record<string, string>; timeout?: number }
   ): Promise<HttpResponse<T>> {
     const url = `${this.config.baseUrl}${path}`;
     const headers = this.getHeaders(options?.headers);
@@ -222,10 +207,13 @@ class HttpClient {
     } catch (error) {
       if (error instanceof DevUtilsError) throw error;
       if (error instanceof TypeError) {
-        throw new DevUtilsError("CONNECTION_ERROR", (error as Error).message);
+        throw new DevUtilsError(
+          "CONNECTION_ERROR",
+          "CONNECTION_ERROR: " + (error as Error).message
+        );
       }
       if ((error as Error).name === "AbortError") {
-        throw new DevUtilsError("TIMEOUT", "Request timeout");
+        throw new DevUtilsError("TIMEOUT", "TIMEOUT: Request timeout");
       }
       throw new DevUtilsError("REQUEST_FAILED", (error as Error).message);
     }
@@ -235,19 +223,11 @@ class HttpClient {
     return this.request("GET", path, undefined, options);
   }
 
-  async post<T = any>(
-    path: string,
-    data?: any,
-    options?: any,
-  ): Promise<HttpResponse<T>> {
+  async post<T = any>(path: string, data?: any, options?: any): Promise<HttpResponse<T>> {
     return this.request("POST", path, data, options);
   }
 
-  async put<T = any>(
-    path: string,
-    data?: any,
-    options?: any,
-  ): Promise<HttpResponse<T>> {
+  async put<T = any>(path: string, data?: any, options?: any): Promise<HttpResponse<T>> {
     return this.request("PUT", path, data, options);
   }
 
@@ -255,11 +235,7 @@ class HttpClient {
     return this.request("DELETE", path, undefined, options);
   }
 
-  async patch<T = any>(
-    path: string,
-    data?: any,
-    options?: any,
-  ): Promise<HttpResponse<T>> {
+  async patch<T = any>(path: string, data?: any, options?: any): Promise<HttpResponse<T>> {
     return this.request("PATCH", path, data, options);
   }
 }
@@ -287,10 +263,7 @@ function calculateDelay(attempt: number, config: RetryConfig): number {
   return delay;
 }
 
-async function retry<T>(
-  fn: () => Promise<T>,
-  config: RetryConfig = {},
-): Promise<T> {
+async function retry<T>(fn: () => Promise<T>, config: RetryConfig = {}): Promise<T> {
   const maxAttempts = config.maxAttempts || 3;
   let lastError: Error | null = null;
 
@@ -311,9 +284,7 @@ async function retry<T>(
     }
   }
 
-  throw (
-    lastError || new DevUtilsError("RETRY_FAILED", "All retry attempts failed")
-  );
+  throw lastError || new DevUtilsError("RETRY_FAILED", "All retry attempts failed");
 }
 
 // ============================================================================
@@ -357,10 +328,7 @@ export class DevUtilsSDK {
       ...(options.headers && { headers: options.headers }),
     };
 
-    const response = await this.httpClient.post<ScreenshotResult>(
-      "/screenshot",
-      payload,
-    );
+    const response = await this.httpClient.post<ScreenshotResult>("/screenshot", payload);
 
     return {
       jobId: response.data.jobId,
@@ -418,10 +386,7 @@ export class DevUtilsSDK {
       timeout: options?.timeout || 30000,
     };
 
-    const response = await this.httpClient.post<ReaderResult>(
-      "/reader",
-      payload,
-    );
+    const response = await this.httpClient.post<ReaderResult>("/reader", payload);
 
     return {
       title: response.data.title || "",
@@ -441,9 +406,7 @@ export class DevUtilsSDK {
       throw new DevUtilsError("INVALID_PARAMS", "Job ID is required");
     }
 
-    const response = await this.httpClient.get<ScreenshotResult>(
-      `/screenshot/${jobId}`,
-    );
+    const response = await this.httpClient.get<ScreenshotResult>(`/screenshot/${jobId}`);
     return response.data;
   }
 
@@ -462,10 +425,7 @@ export class DevUtilsSDK {
   /**
    * Retry a function with exponential backoff
    */
-  static async retry<T>(
-    fn: () => Promise<T>,
-    config?: Partial<RetryConfig>,
-  ): Promise<T> {
+  static async retry<T>(fn: () => Promise<T>, config?: Partial<RetryConfig>): Promise<T> {
     return retry(fn, config);
   }
 }

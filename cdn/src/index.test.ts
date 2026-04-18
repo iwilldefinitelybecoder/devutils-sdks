@@ -457,7 +457,7 @@ describe("Retry Logic", () => {
 
     const fn = async () => {
       attempts++;
-      throw new DevUtilsError("INVALID_API_KEY", "Invalid key", 401);
+      throw new DevUtilsError("INVALID_API_KEY", "INVALID_API_KEY: Invalid key", 401);
     };
 
     await expect(retry(fn, { maxAttempts: 3, initialDelay: 10 })).rejects.toThrow(
