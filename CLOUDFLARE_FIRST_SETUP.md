@@ -33,11 +33,11 @@ After the project is created, all future deployments are automatic via GitHub Ac
 
 ## Custom Domain (Optional)
 
-To use `cdn.devutils.in`:
+To use `cdn.js.deliver.devutils.in`:
 
 1. In Cloudflare Pages project settings
 2. Click **"Custom domains"**
-3. Add `cdn.devutils.in`
+3. Add `cdn.js.deliver.devutils.in`
 4. Update DNS CNAME record at your registrar to point to `devutils-sdk-cdn.pages.dev`
 
 ---

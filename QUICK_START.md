@@ -160,7 +160,7 @@ See `CONTRIBUTING.md`
 
 - **npm Package**: https://www.npmjs.com/package/@devutils/sdk
 - **PyPI Package**: https://pypi.org/project/devutils-sdk/
-- **GitHub Repo**: https://github.com/devutils/sdks
+- **GitHub Repo**: https://github.com/iwilldefinitelybecoder/devutils-sdks
 - **Documentation**: https://docs.devutils.in
 
 ---

@@ -23,10 +23,10 @@ npm install @devutils/sdk
 ```
 
 ```typescript
-import { DevUtilsSDK } from "@devutils/sdk";
+import { DevUtilsSDK } from '@devutils/sdk';
 
-const sdk = new DevUtilsSDK("your-api-key");
-const result = await sdk.screenshot("https://example.com");
+const sdk = new DevUtilsSDK('your-api-key');
+const result = await sdk.screenshot('https://example.com');
 console.log(result.url);
 ```
 
@@ -51,12 +51,10 @@ asyncio.run(main())
 ### CDN (Browser)
 
 ```html
-<script src="https://cdn.devutils.in/latest/sdk.min.js"></script>
+<script src="https://cdn.js.deliver.devutils.in/sdk.min.js"></script>
 <script>
-  const sdk = new DevUtilsSDK("your-api-key");
-  sdk
-    .screenshot({ url: "https://example.com" })
-    .then((result) => console.log(result.url));
+  const sdk = new DevUtilsSDK('your-api-key');
+  sdk.screenshot({ url: 'https://example.com' }).then((result) => console.log(result.url));
 </script>
 ```
 
