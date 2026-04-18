@@ -48,18 +48,14 @@ function getJobId(response: JobResponse): string {
  * Check if job is complete
  */
 function isJobComplete(jobStatus: string): boolean {
-  return (
-    jobStatus === "COMPLETED" || jobStatus === "DONE" || jobStatus === "SUCCESS"
-  );
+  return jobStatus === "COMPLETED" || jobStatus === "DONE" || jobStatus === "SUCCESS";
 }
 
 /**
  * Check if job failed
  */
 function isJobFailed(jobStatus: string): boolean {
-  return (
-    jobStatus === "FAILED" || jobStatus === "ERROR" || jobStatus === "CANCELLED"
-  );
+  return jobStatus === "FAILED" || jobStatus === "ERROR" || jobStatus === "CANCELLED";
 }
 
 /**
@@ -80,7 +76,7 @@ function sleep(ms: number): Promise<void> {
 export async function resolveJob<T = any>(
   response: JobResponse,
   pollFn: (jobId: string) => Promise<JobResponse>,
-  config: Partial<JobResolverConfig> = {},
+  config: Partial<JobResolverConfig> = {}
 ): Promise<T> {
   const finalConfig = { ...DEFAULT_JOB_RESOLVER_CONFIG, ...config };
 
@@ -104,7 +100,7 @@ export async function resolveJob<T = any>(
       throw new DevUtilsError(
         "JOB_TIMEOUT",
         `Job ${jobId} did not complete within ${finalConfig.maxWaitMs}ms`,
-        408,
+        408
       );
     }
 
@@ -114,7 +110,7 @@ export async function resolveJob<T = any>(
       // Increase delay for next poll (exponential backoff)
       pollDelay = Math.min(
         pollDelay * finalConfig.pollBackoffMultiplier,
-        finalConfig.maxPollDelayMs,
+        finalConfig.maxPollDelayMs
       );
     }
 
@@ -130,7 +126,8 @@ export async function resolveJob<T = any>(
 
       // Job completed successfully
       if (isJobComplete(status)) {
-        return jobResponse.data as T;
+        // Return .data if present, otherwise return the whole response
+        return (jobResponse.data !== undefined ? jobResponse.data : jobResponse) as T;
       }
 
       // Job failed
@@ -139,7 +136,7 @@ export async function resolveJob<T = any>(
         throw new DevUtilsError(
           "JOB_FAILED",
           typeof error === "string" ? error : error.message || "Job failed",
-          400,
+          400
         );
       }
 
@@ -165,11 +162,9 @@ export async function resolveJob<T = any>(
 export async function resolveJobs<T = any>(
   responses: JobResponse[],
   pollFn: (jobId: string) => Promise<JobResponse>,
-  config: Partial<JobResolverConfig> = {},
+  config: Partial<JobResolverConfig> = {}
 ): Promise<T[]> {
-  return Promise.all(
-    responses.map((response) => resolveJob<T>(response, pollFn, config)),
-  );
+  return Promise.all(responses.map((response) => resolveJob<T>(response, pollFn, config)));
 }
 
 /**
@@ -178,12 +173,10 @@ export async function resolveJobs<T = any>(
  */
 export function createJobResolver(
   pollFn: (jobId: string) => Promise<JobResponse>,
-  config: Partial<JobResolverConfig> = {},
+  config: Partial<JobResolverConfig> = {}
 ) {
   return {
-    resolve: <T = any>(response: JobResponse) =>
-      resolveJob<T>(response, pollFn, config),
-    resolveMany: <T = any>(responses: JobResponse[]) =>
-      resolveJobs<T>(responses, pollFn, config),
+    resolve: <T = any>(response: JobResponse) => resolveJob<T>(response, pollFn, config),
+    resolveMany: <T = any>(responses: JobResponse[]) => resolveJobs<T>(responses, pollFn, config),
   };
 }

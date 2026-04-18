@@ -1,7 +1,4 @@
-import {
-  resolveJob,
-  DEFAULT_JOB_RESOLVER_CONFIG,
-} from "../../core/job-resolver";
+import { resolveJob, DEFAULT_JOB_RESOLVER_CONFIG } from "../../core/job-resolver";
 
 describe("JobResolver", () => {
   beforeEach(() => {
@@ -53,9 +50,7 @@ describe("JobResolver", () => {
         initialPollDelayMs: 100,
       });
 
-      await jest.runAllTimersAsync();
-
-      await expect(resultPromise).rejects.toMatchObject({
+      await expect(Promise.all([resultPromise, jest.runAllTimersAsync()])).rejects.toMatchObject({
         code: "JOB_FAILED",
       });
     });
@@ -69,9 +64,9 @@ describe("JobResolver", () => {
         maxWaitMs: 1000,
       });
 
-      await jest.advanceTimersByTimeAsync(1500);
-
-      await expect(resultPromise).rejects.toMatchObject({
+      await expect(
+        Promise.all([resultPromise, jest.advanceTimersByTimeAsync(1500)])
+      ).rejects.toMatchObject({
         code: "JOB_TIMEOUT",
       });
     });
@@ -168,9 +163,7 @@ describe("JobResolver", () => {
         initialPollDelayMs: 100,
       });
 
-      await jest.runAllTimersAsync();
-
-      await expect(resultPromise).rejects.toMatchObject({
+      await expect(Promise.all([resultPromise, jest.runAllTimersAsync()])).rejects.toMatchObject({
         code: "JOB_FAILED",
       });
     });

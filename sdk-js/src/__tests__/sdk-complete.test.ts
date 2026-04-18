@@ -44,18 +44,10 @@ describe("DevUtilsError", () => {
     const timeoutError = new DevUtilsError("TIMEOUT", "Timeout");
     expect(timeoutError.isRetryable()).toBe(true);
 
-    const rateLimitError = new DevUtilsError(
-      "RATE_LIMITED",
-      "Rate limited",
-      429,
-    );
+    const rateLimitError = new DevUtilsError("RATE_LIMITED", "Rate limited", 429);
     expect(rateLimitError.isRetryable()).toBe(true);
 
-    const invalidKeyError = new DevUtilsError(
-      "INVALID_API_KEY",
-      "Invalid key",
-      401,
-    );
+    const invalidKeyError = new DevUtilsError("INVALID_API_KEY", "Invalid key", 401);
     expect(invalidKeyError.isRetryable()).toBe(false);
   });
 });
@@ -97,9 +89,10 @@ describe("Screenshot API", () => {
   let mockPost: jest.Mock;
 
   beforeEach(() => {
-    sdk = new DevUtilsSDK("test-api-key");
     mockPost = jest.fn();
     mockHttpClient.prototype.post = mockPost;
+    mockHttpClient.prototype.get = jest.fn();
+    sdk = new DevUtilsSDK("test-api-key");
   });
 
   test("should take screenshot with default options", async () => {
@@ -205,18 +198,15 @@ describe("Screenshot API", () => {
   });
 
   test("should handle HTTP errors", async () => {
-    mockPost.mockRejectedValue(
-      new DevUtilsError("HTTP_ERROR", "Unauthorized", 401),
-    );
+    mockPost.mockRejectedValue(new DevUtilsError("HTTP_ERROR", "Unauthorized", 401));
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow(DevUtilsError);
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow(DevUtilsError);
   });
 
   test("should get screenshot status", async () => {
     const mockGet = jest.fn();
     mockHttpClient.prototype.get = mockGet;
+    (mockHttpClient.mock.instances[mockHttpClient.mock.instances.length - 1] as any).get = mockGet;
 
     mockGet.mockResolvedValue({
       statusCode: 200,
@@ -244,9 +234,10 @@ describe("PDF API", () => {
   let mockPost: jest.Mock;
 
   beforeEach(() => {
-    sdk = new DevUtilsSDK("test-api-key");
     mockPost = jest.fn();
     mockHttpClient.prototype.post = mockPost;
+    mockHttpClient.prototype.get = jest.fn();
+    sdk = new DevUtilsSDK("test-api-key");
   });
 
   test("should generate PDF with default options", async () => {
@@ -290,6 +281,7 @@ describe("PDF API", () => {
   test("should get PDF status", async () => {
     const mockGet = jest.fn();
     mockHttpClient.prototype.get = mockGet;
+    (mockHttpClient.mock.instances[mockHttpClient.mock.instances.length - 1] as any).get = mockGet;
 
     mockGet.mockResolvedValue({
       statusCode: 200,
@@ -317,9 +309,9 @@ describe("Reader API", () => {
   let mockPost: jest.Mock;
 
   beforeEach(() => {
-    sdk = new DevUtilsSDK("test-api-key");
     mockPost = jest.fn();
     mockHttpClient.prototype.post = mockPost;
+    sdk = new DevUtilsSDK("test-api-key");
   });
 
   test("should read content from URL", async () => {
@@ -373,11 +365,11 @@ describe("Full Lifecycle", () => {
   let mockGet: jest.Mock;
 
   beforeEach(() => {
-    sdk = new DevUtilsSDK("test-api-key");
     mockPost = jest.fn();
     mockGet = jest.fn();
     mockHttpClient.prototype.post = mockPost;
     mockHttpClient.prototype.get = mockGet;
+    sdk = new DevUtilsSDK("test-api-key");
   });
 
   test("should complete screenshot lifecycle", async () => {
@@ -481,9 +473,10 @@ describe("Edge Cases", () => {
   let mockPost: jest.Mock;
 
   beforeEach(() => {
-    sdk = new DevUtilsSDK("test-api-key");
     mockPost = jest.fn();
     mockHttpClient.prototype.post = mockPost;
+    mockHttpClient.prototype.get = jest.fn();
+    sdk = new DevUtilsSDK("test-api-key");
   });
 
   test("should handle very long URLs", async () => {
@@ -521,31 +514,21 @@ describe("Edge Cases", () => {
   });
 
   test("should handle 500 server error", async () => {
-    mockPost.mockRejectedValue(
-      new DevUtilsError("HTTP_ERROR", "Server error", 500),
-    );
+    mockPost.mockRejectedValue(new DevUtilsError("HTTP_ERROR", "Server error", 500));
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow();
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow();
   });
 
   test("should handle 429 rate limit error", async () => {
-    mockPost.mockRejectedValue(
-      new DevUtilsError("RATE_LIMITED", "Rate limited", 429),
-    );
+    mockPost.mockRejectedValue(new DevUtilsError("RATE_LIMITED", "Rate limited", 429));
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow();
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow();
   });
 
   test("should handle timeout", async () => {
-    mockPost.mockRejectedValue(new DevUtilsError("TIMEOUT", "Request timeout"));
+    mockPost.mockRejectedValue(new DevUtilsError("TIMEOUT", "TIMEOUT: Request timeout"));
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow("TIMEOUT");
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow("TIMEOUT");
   });
 
   test("should handle malformed response", async () => {

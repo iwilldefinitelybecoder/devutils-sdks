@@ -1,8 +1,4 @@
-import {
-  retry,
-  retryWithPredicate,
-  DEFAULT_RETRY_CONFIG,
-} from "../../core/retry-engine";
+import { retry, retryWithPredicate, DEFAULT_RETRY_CONFIG } from "../../core/retry-engine";
 
 describe("RetryEngine", () => {
   beforeEach(() => {
@@ -50,17 +46,15 @@ describe("RetryEngine", () => {
       const fn = jest.fn().mockRejectedValue({ status: 500 });
 
       const resultPromise = retry(fn, { maxRetries: 2, initialDelayMs: 100 });
-      await jest.runAllTimersAsync();
 
-      await expect(resultPromise).rejects.toMatchObject({ status: 500 });
+      await expect(Promise.all([resultPromise, jest.runAllTimersAsync()])).rejects.toMatchObject({
+        status: 500,
+      });
       expect(fn).toHaveBeenCalledTimes(3); // Initial + 2 retries
     });
 
     it("should retry on 408 (timeout)", async () => {
-      const fn = jest
-        .fn()
-        .mockRejectedValueOnce({ status: 408 })
-        .mockResolvedValue("success");
+      const fn = jest.fn().mockRejectedValueOnce({ status: 408 }).mockResolvedValue("success");
 
       const resultPromise = retry(fn, { maxRetries: 2, initialDelayMs: 100 });
       await jest.runAllTimersAsync();
@@ -71,10 +65,7 @@ describe("RetryEngine", () => {
     });
 
     it("should retry on 429 (rate limited)", async () => {
-      const fn = jest
-        .fn()
-        .mockRejectedValueOnce({ status: 429 })
-        .mockResolvedValue("success");
+      const fn = jest.fn().mockRejectedValueOnce({ status: 429 }).mockResolvedValue("success");
 
       const resultPromise = retry(fn, { maxRetries: 2, initialDelayMs: 100 });
       await jest.runAllTimersAsync();
@@ -85,10 +76,7 @@ describe("RetryEngine", () => {
     });
 
     it("should retry on 503 (service unavailable)", async () => {
-      const fn = jest
-        .fn()
-        .mockRejectedValueOnce({ status: 503 })
-        .mockResolvedValue("success");
+      const fn = jest.fn().mockRejectedValueOnce({ status: 503 }).mockResolvedValue("success");
 
       const resultPromise = retry(fn, { maxRetries: 2, initialDelayMs: 100 });
       await jest.runAllTimersAsync();
@@ -151,10 +139,7 @@ describe("RetryEngine", () => {
     });
 
     it("should pass attempt number to predicate", async () => {
-      const fn = jest
-        .fn()
-        .mockRejectedValueOnce({ code: "ERROR" })
-        .mockResolvedValue("success");
+      const fn = jest.fn().mockRejectedValueOnce({ code: "ERROR" }).mockResolvedValue("success");
 
       const shouldRetry = jest.fn().mockReturnValue(true);
       const resultPromise = retryWithPredicate(fn, shouldRetry, {
@@ -165,10 +150,7 @@ describe("RetryEngine", () => {
       await jest.runAllTimersAsync();
       await resultPromise;
 
-      expect(shouldRetry).toHaveBeenCalledWith(
-        expect.objectContaining({ code: "ERROR" }),
-        0,
-      );
+      expect(shouldRetry).toHaveBeenCalledWith(expect.objectContaining({ code: "ERROR" }), 0);
     });
   });
 

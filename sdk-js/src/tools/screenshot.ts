@@ -118,7 +118,7 @@ export interface ScreenshotResult {
 export async function screenshot(
   url: string,
   options: ScreenshotOptions = {},
-  httpClient: HttpClient,
+  httpClient: HttpClient
 ): Promise<ScreenshotResult> {
   if (!url || typeof url !== "string") {
     throw new Error("URL is required and must be a string");
@@ -153,18 +153,15 @@ export async function screenshot(
     };
 
     // Make API request
-    const response = await httpClient.post<JobResponse>(
-      "/api/screenshot",
-      payload,
-      { timeout: options.timeout },
-    );
+    const response = await httpClient.post<JobResponse>("/api/screenshot", payload, {
+      timeout: options.timeout,
+    });
 
     // Resolve job (poll until complete)
     const result = await resolveJob(
       response,
-      (jobId) =>
-        httpClient.get(`/screenshots/${jobId}`, { timeout: options.timeout }),
-      { maxWaitMs: options.timeout || 30000 },
+      (jobId) => httpClient.get(`/screenshots/${jobId}`, { timeout: options.timeout }),
+      { maxWaitMs: options.timeout || 30000 }
     );
 
     // Extract URL from result

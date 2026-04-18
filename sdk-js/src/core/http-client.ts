@@ -26,17 +26,14 @@ export class HttpClient {
     this.apiKey = config.apiKey;
     this.token = config.token;
     this.baseUrl = config.baseUrl || "https://api.devutils.in";
-    this.timeout = config.timeout || 30000; // 30 seconds default
+    this.timeout = config.timeout || 30000;
   }
 
-  /**
-   * Make an HTTP request with automatic auth headers
-   */
   async request<T = any>(
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     path: string,
     data?: any,
-    options?: { timeout?: number },
+    options?: { timeout?: number }
   ): Promise<HttpResponse<T>> {
     const url = `${this.baseUrl}${path}`;
     const timeout = options?.timeout || this.timeout;
@@ -46,10 +43,13 @@ export class HttpClient {
       ...this.getAuthHeaders(),
     };
 
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
     const fetchOptions: RequestInit = {
       method,
       headers,
-      signal: AbortSignal.timeout(timeout),
+      signal: controller.signal,
     };
 
     if (data && (method === "POST" || method === "PUT" || method === "PATCH")) {
@@ -58,136 +58,72 @@ export class HttpClient {
 
     try {
       const response = await fetch(url, fetchOptions);
+      clearTimeout(timer);
       const responseData = await response.json();
 
       if (!response.ok) {
-        throw {
-          status: response.status,
-          data: responseData,
-        };
+        throw { status: response.status, data: responseData };
       }
 
       return {
         status: response.status,
         data: responseData,
-        headers: Object.fromEntries(response.headers as any),
+        headers: response.headers ? Object.fromEntries(response.headers as any) : {},
       };
     } catch (error: any) {
-      // Re-throw HTTP errors
-      if (error.status) {
-        throw error;
-      }
+      clearTimeout(timer);
 
-      // Handle timeout
+      if (error.status) throw error;
+
       if (error.name === "AbortError") {
-        throw {
-          status: 408,
-          data: { error: "TIMEOUT", message: "Request timeout" },
-        };
+        throw { status: 408, data: { error: "TIMEOUT", message: "Request timeout" } };
       }
 
-      // Handle network errors
-      throw {
-        status: 0,
-        data: { error: "NETWORK_ERROR", message: error.message },
-      };
+      throw { status: 0, data: { error: "NETWORK_ERROR", message: error.message } };
     }
   }
 
-  /**
-   * GET request
-   */
   async get<T = any>(path: string, options?: { timeout?: number }): Promise<T> {
     const response = await this.request<T>("GET", path, undefined, options);
     return response.data;
   }
 
-  /**
-   * POST request
-   */
-  async post<T = any>(
-    path: string,
-    data?: any,
-    options?: { timeout?: number },
-  ): Promise<T> {
+  async post<T = any>(path: string, data?: any, options?: { timeout?: number }): Promise<T> {
     const response = await this.request<T>("POST", path, data, options);
     return response.data;
   }
 
-  /**
-   * PUT request
-   */
-  async put<T = any>(
-    path: string,
-    data?: any,
-    options?: { timeout?: number },
-  ): Promise<T> {
+  async put<T = any>(path: string, data?: any, options?: { timeout?: number }): Promise<T> {
     const response = await this.request<T>("PUT", path, data, options);
     return response.data;
   }
 
-  /**
-   * DELETE request
-   */
-  async delete<T = any>(
-    path: string,
-    options?: { timeout?: number },
-  ): Promise<T> {
+  async delete<T = any>(path: string, options?: { timeout?: number }): Promise<T> {
     const response = await this.request<T>("DELETE", path, undefined, options);
     return response.data;
   }
 
-  /**
-   * PATCH request
-   */
-  async patch<T = any>(
-    path: string,
-    data?: any,
-    options?: { timeout?: number },
-  ): Promise<T> {
+  async patch<T = any>(path: string, data?: any, options?: { timeout?: number }): Promise<T> {
     const response = await this.request<T>("PATCH", path, data, options);
     return response.data;
   }
 
-  /**
-   * Get authentication headers based on configured credentials
-   * Priority: API key > JWT token > anonymous
-   */
   private getAuthHeaders(): Record<string, string> {
-    if (this.apiKey) {
-      return {
-        "x-api-key": this.apiKey,
-      };
-    }
-
-    if (this.token) {
-      return {
-        Authorization: `Bearer ${this.token}`,
-      };
-    }
-
+    if (this.apiKey) return { "x-api-key": this.apiKey };
+    if (this.token) return { Authorization: `Bearer ${this.token}` };
     return {};
   }
 
-  /**
-   * Update API key
-   */
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
     this.token = undefined;
   }
 
-  /**
-   * Update JWT token
-   */
   setToken(token: string): void {
     this.token = token;
     this.apiKey = undefined;
   }
 
-  /**
-   * Clear authentication
-   */
   clearAuth(): void {
     this.apiKey = undefined;
     this.token = undefined;

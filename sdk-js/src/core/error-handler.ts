@@ -8,12 +8,7 @@ export class DevUtilsError extends Error {
   statusCode: number;
   originalError?: any;
 
-  constructor(
-    code: string,
-    message: string,
-    statusCode: number = 500,
-    originalError?: any,
-  ) {
+  constructor(code: string, message: string, statusCode: number = 500, originalError?: any) {
     super(message);
     this.name = "DevUtilsError";
     this.code = code;
@@ -81,19 +76,14 @@ export function normalizeError(error: any): DevUtilsError {
     return error;
   }
 
-  // HTTP error response
-  if (error && typeof error === "object") {
+  // HTTP error response (must have a status/statusCode to be treated as HTTP error)
+  if (error && typeof error === "object" && (error.status || error.statusCode)) {
     const status = error.status || error.statusCode || 500;
     const data = error.data || {};
 
     // API error format: { error: "CODE", message: "..." }
     if (data.error && typeof data.error === "string") {
-      return new DevUtilsError(
-        data.error,
-        data.message || data.error,
-        status,
-        error,
-      );
+      return new DevUtilsError(data.error, data.message || data.error, status, error);
     }
 
     // Alternative format: { success: false, error: { code, message } }
@@ -102,7 +92,7 @@ export function normalizeError(error: any): DevUtilsError {
         data.error.code || "UNKNOWN_ERROR",
         data.error.message || "Unknown error",
         status,
-        error,
+        error
       );
     }
 
@@ -122,7 +112,7 @@ export function normalizeError(error: any): DevUtilsError {
     "UNKNOWN_ERROR",
     error?.message || "An unknown error occurred",
     500,
-    error,
+    error
   );
 }
 

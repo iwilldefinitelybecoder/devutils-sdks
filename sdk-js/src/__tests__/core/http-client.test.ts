@@ -107,12 +107,15 @@ describe("HttpClient", () => {
           headers: expect.objectContaining({
             "x-api-key": "test-api-key",
           }),
-        }),
+        })
       );
     });
 
     it("should set Bearer token header", async () => {
-      const client = new HttpClient({ token: "test-token" });
+      const client = new HttpClient({
+        token: "test-token",
+        baseUrl: "https://api.test.com",
+      });
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => ({}),
@@ -127,7 +130,7 @@ describe("HttpClient", () => {
           headers: expect.objectContaining({
             Authorization: "Bearer test-token",
           }),
-        }),
+        })
       );
     });
 
@@ -160,7 +163,7 @@ describe("HttpClient", () => {
       await httpClient.get("/test");
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
-        expect.objectContaining({ method: "GET" }),
+        expect.objectContaining({ method: "GET" })
       );
     });
 
@@ -171,7 +174,7 @@ describe("HttpClient", () => {
         expect.objectContaining({
           method: "POST",
           body: JSON.stringify({ data: "test" }),
-        }),
+        })
       );
     });
 
@@ -179,7 +182,7 @@ describe("HttpClient", () => {
       await httpClient.put("/test", { data: "test" });
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
-        expect.objectContaining({ method: "PUT" }),
+        expect.objectContaining({ method: "PUT" })
       );
     });
 
@@ -187,7 +190,7 @@ describe("HttpClient", () => {
       await httpClient.delete("/test");
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
-        expect.objectContaining({ method: "DELETE" }),
+        expect.objectContaining({ method: "DELETE" })
       );
     });
 
@@ -195,7 +198,7 @@ describe("HttpClient", () => {
       await httpClient.patch("/test", { data: "test" });
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
-        expect.objectContaining({ method: "PATCH" }),
+        expect.objectContaining({ method: "PATCH" })
       );
     });
   });
