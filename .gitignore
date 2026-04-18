@@ -1,0 +1,83 @@
+# Dependencies
+node_modules/
+*.egg-info/
+dist/
+build/
+*.pyc
+__pycache__/
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Build outputs
+*.tsbuildinfo
+*.js
+*.d.ts
+!jest.config.js
+!scripts/**/*.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+.jest-cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Release artifacts
+cdn/v*/
+cdn/latest/
+sdk-python/dist/
+sdk-python/build/
+
+# Internal documentation (not for public repo)
+SETUP.md
+DEPLOY_NOW.md
+VERIFY_SETUP.md
+SETUP_COMPLETE.md
+DEPLOYMENT_SUMMARY.md
+MONOREPO_STRUCTURE.md
+QUICK_REFERENCE.md
+FAQ.md
+READY_TO_RELEASE.md
+RELEASE_CHECKLIST.md
+
+# Git
+.git/
+.gitkeep

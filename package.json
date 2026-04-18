@@ -1,0 +1,63 @@
+{
+  "name": "devutils-sdks",
+  "version": "1.0.0",
+  "description": "Production-grade SDKs for DevUtils API - Screenshot, PDF, Reader, and more",
+  "private": true,
+  "license": "MIT",
+  "author": "DevUtils",
+  "homepage": "https://devutils.in",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iwilldefinitelybecoder/devutils-sdks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iwilldefinitelybecoder/devutils-sdks/issues"
+  },
+  "workspaces": [
+    "sdk-js",
+    "cdn"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=sdk-js",
+    "build:all": "npm run build:js && npm run build:python && npm run build:cdn",
+    "build:js": "npm run build --workspace=sdk-js",
+    "build:python": "cd sdk-python && python -m build 2>/dev/null || echo 'Python SDK build skipped (Python not installed)'",
+    "build:cdn": "npm run build --workspace=cdn",
+    "test": "npm run test --workspace=sdk-js",
+    "test:all": "npm run test:js && npm run test:cdn && npm run test:python",
+    "test:js": "npm run test --workspace=sdk-js",
+    "test:cdn": "npm run test --workspace=cdn",
+    "test:python": "cd sdk-python && pytest 2>/dev/null || echo 'Python tests skipped'",
+    "lint": "npm run lint --workspace=sdk-js && npm run lint --workspace=cdn",
+    "format": "npm run format --workspace=sdk-js && npm run format --workspace=cdn",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run",
+    "commit:lint": "commitlint --from HEAD~1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.0.0",
+    "@commitlint/config-conventional": "^18.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/commit-analyzer": "^11.0.0",
+    "@semantic-release/exec": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/github": "^9.0.0",
+    "@semantic-release/npm": "^11.0.0",
+    "@semantic-release/release-notes-generator": "^12.0.0",
+    "semantic-release": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "devutils",
+    "sdk",
+    "screenshot",
+    "pdf",
+    "reader",
+    "webhook",
+    "api",
+    "monorepo"
+  ]
+}

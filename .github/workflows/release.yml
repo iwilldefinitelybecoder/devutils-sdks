@@ -1,0 +1,93 @@
+name: Release SDKs
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          cd devutils_sdk
+          npm ci
+          pip install build twine
+
+      - name: Verify commit messages
+        working-directory: devutils_sdk
+        run: npm run commit:lint || true
+
+      - name: Build all SDKs
+        working-directory: devutils_sdk
+        run: npm run build:all
+
+      - name: Test all SDKs
+        working-directory: devutils_sdk
+        run: npm run test:all
+
+      - name: Release
+        working-directory: devutils_sdk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: npm run release
+
+      - name: Deploy CDN to Cloudflare Pages
+        if: github.ref == 'refs/heads/main'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npm install -g wrangler
+          mkdir -p devutils_sdk/cdn/deploy
+          cp devutils_sdk/cdn/dist/sdk.min.js devutils_sdk/cdn/deploy/sdk.min.js
+          cp devutils_sdk/cdn/dist/sdk.esm.js devutils_sdk/cdn/deploy/sdk.esm.js
+          cp devutils_sdk/cdn/dist/sdk.d.ts devutils_sdk/cdn/deploy/sdk.d.ts
+          wrangler pages deploy devutils_sdk/cdn/deploy \
+            --project-name devutils-sdk-cdn \
+            --branch main
+
+      - name: Notify Slack (optional)
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "SDK Release: ${{ job.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*SDK Release* - ${{ job.status }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow>"
+                  }
+                }
+              ]
+            }

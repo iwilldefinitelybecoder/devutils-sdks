@@ -1,0 +1,41 @@
+{
+  "branches": [
+    "main",
+    {
+      "name": "beta",
+      "prerelease": true
+    }
+  ],
+  "tagFormat": "v${version}",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/npm",
+      {
+        "pkgRoot": "sdk-js"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "bash ./scripts/release-all.sh ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "sdk-js/package.json",
+          "sdk-js/package-lock.json",
+          "sdk-python/pyproject.toml",
+          "sdk-python/setup.py",
+          "cdn/package.json",
+          "CHANGELOG.md"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}
