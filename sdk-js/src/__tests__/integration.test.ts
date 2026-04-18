@@ -1,4 +1,4 @@
-import DevUtilsSDK from "../../index";
+import DevUtilsSDK from "../index";
 
 /**
  * Integration tests for DevUtilsSDK
@@ -185,9 +185,7 @@ describe("DevUtilsSDK Integration", () => {
         }),
       });
 
-      await expect(
-        devutils.screenshot("https://example.com"),
-      ).rejects.toMatchObject({
+      await expect(devutils.screenshot("https://example.com")).rejects.toMatchObject({
         code: "RATE_LIMITED",
         statusCode: 429,
       });
@@ -203,9 +201,7 @@ describe("DevUtilsSDK Integration", () => {
         }),
       });
 
-      await expect(
-        devutils.screenshot("https://example.com"),
-      ).rejects.toMatchObject({
+      await expect(devutils.screenshot("https://example.com")).rejects.toMatchObject({
         code: "UNAUTHORIZED",
         statusCode: 401,
       });
