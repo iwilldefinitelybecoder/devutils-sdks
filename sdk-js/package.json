@@ -46,7 +46,7 @@
     "directory": "sdk-js"
   },
   "bugs": {
-    "url": "https://github.com/devutils/sdk-js/issues"
+    "url": "https://github.com/devutils/sdks/issues"
   },
   "homepage": "https://devutils.in",
   "devDependencies": {

@@ -1,0 +1,27 @@
+# DevUtils SDKs Code Owners
+
+# Root configuration files
+/.eslintrc.json @devutils/maintainers
+/.prettierrc @devutils/maintainers
+/tsconfig.json @devutils/maintainers
+/jest.config.js @devutils/maintainers
+/.npmrc @devutils/maintainers
+/.releaserc @devutils/maintainers
+
+# JavaScript SDK
+/sdk-js/ @devutils/maintainers
+
+# CDN SDK
+/cdn/ @devutils/maintainers
+
+# Python SDK
+/sdk-python/ @devutils/maintainers
+
+# CI/CD and scripts
+/.github/ @devutils/maintainers
+/scripts/ @devutils/maintainers
+
+# Documentation
+/docs/ @devutils/maintainers
+/CONTRIBUTING.md @devutils/maintainers
+/README.md @devutils/maintainers

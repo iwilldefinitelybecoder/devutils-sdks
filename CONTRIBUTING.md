@@ -1,214 +1,160 @@
 # Contributing to DevUtils SDKs
 
-Thank you for your interest in contributing! This document provides guidelines and instructions for contributing.
+Thank you for contributing to the DevUtils SDKs monorepo! This document outlines our development standards and configuration guidelines.
 
-## Code of Conduct
+## Project Structure
 
-Be respectful, inclusive, and professional in all interactions.
+```
+devutils_sdk/
+├── sdk-js/              # JavaScript/TypeScript SDK (npm)
+├── cdn/                 # CDN-optimized browser SDK
+├── sdk-python/          # Python SDK (PyPI)
+├── scripts/             # Release and build scripts
+└── docs/                # Documentation
+```
 
-## Getting Started
+## Configuration Standards
 
-### Prerequisites
+### TypeScript Configuration
 
-- Node.js 18+
-- Python 3.8+
-- Git
+- **Root `tsconfig.json`**: Base configuration for all packages
+- **Package-specific `tsconfig.json`**: Extends root config with package-specific settings
+- **Key settings**:
+  - `target: ES2020` - Modern JavaScript target
+  - `strict: true` - Strict type checking enabled
+  - `declaration: true` - Generate .d.ts files
+  - `sourceMap: true` - Enable source maps for debugging
 
-### Setup Development Environment
+### Jest Configuration
+
+- **Root `jest.config.js`**: Multi-project configuration
+- **Coverage threshold**: 70% for all metrics (branches, functions, lines, statements)
+- **Test environments**:
+  - `sdk-js`: `node` (server-side SDK)
+  - `cdn`: `jsdom` (browser SDK)
+
+### ESLint & Prettier
+
+- **Root `.eslintrc.json`**: Shared ESLint rules for all packages
+- **Root `.prettierrc`**: Consistent code formatting
+- **Ignore files**: `.eslintignore` and `.prettierignore` prevent linting build artifacts
+
+### npm Configuration
+
+- **`.npmrc`**: Monorepo-wide npm settings
+  - `save-exact=true`: Pin exact versions
+  - `require-lock=true`: Enforce lockfile usage
+  - `legacy-peer-deps=true`: Handle peer dependency conflicts
+  - `audit-level=moderate`: Security audit threshold
+
+## Development Workflow
+
+### Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/iwilldefinitelybecoder/devutils-sdks.git
-cd devutils-sdks
-
 # Install dependencies
 npm install
-cd sdk-python && pip install -e ".[dev]"
-cd ..
 
 # Build all SDKs
 npm run build:all
 
-# Run tests
+# Run all tests
 npm run test:all
-```
 
-## Development Workflow
-
-### 1. Create a Branch
-
-```bash
-git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/your-bug-fix
-```
-
-### 2. Make Changes
-
-- Follow the existing code style
-- Add tests for new features
-- Update documentation
-
-### 3. Commit with Conventional Commits
-
-```bash
-git commit -m "feat: add new feature"
-git commit -m "fix: resolve bug"
-git commit -m "docs: update README"
-git commit -m "test: add test coverage"
-git commit -m "refactor: improve code structure"
-```
-
-### 4. Push and Create Pull Request
-
-```bash
-git push origin feature/your-feature-name
-```
-
-Then create a PR on GitHub.
-
-## Commit Message Format
-
-We use [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-### Types
-
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, missing semicolons, etc.)
-- `refactor`: Code refactoring without feature changes
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Build process, dependencies, etc.
-
-### Scopes
-
-- `sdk-js`: JavaScript SDK
-- `sdk-python`: Python SDK
-- `cdn`: CDN SDK
-- `core`: Shared core logic
-- `release`: Release process
-
-### Examples
-
-```bash
-git commit -m "feat(sdk-js): add retry configuration options"
-git commit -m "fix(sdk-python): handle async context properly"
-git commit -m "docs(core): update API reference"
-git commit -m "test(cdn): add browser compatibility tests"
-```
-
-## Code Style
-
-### JavaScript/TypeScript
-
-- Use ESLint configuration
-- Format with Prettier
-- 2-space indentation
-- Semicolons required
-
-```bash
+# Lint and format
 npm run lint
 npm run format
 ```
 
-### Python
+### Making Changes
 
-- Follow PEP 8
-- Use Black for formatting
-- Use isort for imports
+1. **Create a feature branch** from `main`
+2. **Make your changes** following the code style
+3. **Run tests locally**: `npm run test:all`
+4. **Lint and format**: `npm run lint && npm run format`
+5. **Commit with conventional commits**: `feat:`, `fix:`, `docs:`, etc.
+6. **Push and create a pull request**
 
-```bash
-cd sdk-python
-black devutils_sdk tests
-isort devutils_sdk tests
+### Commit Message Format
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+type(scope): subject
+
+body
+
+footer
 ```
 
-## Testing
+**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 
-### JavaScript
+**Examples**:
 
-```bash
-npm run test:js
-npm run test:js -- --watch
-npm run test:js -- --coverage
-```
+- `feat(sdk-js): add retry mechanism`
+- `fix(cdn): resolve bundle size issue`
+- `docs: update API documentation`
 
-### Python
+## Version Management
 
-```bash
-cd sdk-python
-pytest
-pytest --cov=devutils_sdk
-```
+- **Semantic Versioning**: MAJOR.MINOR.PATCH
+- **Automated releases**: semantic-release handles version bumping
+- **All SDKs sync**: Python, JavaScript, and CDN versions stay synchronized
 
-### All SDKs
+## Publishing
+
+### npm (JavaScript SDK)
 
 ```bash
-npm run test:all
+npm run release
 ```
 
-## Documentation
+Publishes to npm registry as `@devutils/sdk`
 
-- Update README.md for user-facing changes
-- Add JSDoc/docstrings for new functions
-- Update docs/ folder for significant changes
-- Include examples for new features
+### PyPI (Python SDK)
 
-## Pull Request Process
+Automatically published via `release-all.sh` script using twine
 
-1. **Update documentation** - Ensure docs reflect your changes
-2. **Add tests** - New features must have tests
-3. **Run tests** - All tests must pass
-4. **Update CHANGELOG** - Add entry under "Unreleased"
-5. **Request review** - At least one approval required
-6. **Squash commits** - Keep history clean (optional)
+### CDN (Browser SDK)
 
-## Release Process
+Files prepared at `cdn/v{version}/` and `cdn/latest/`
 
-Releases are automated via semantic versioning. Maintainers will:
+## Configuration Files Reference
 
-1. Review and merge PRs
-2. Semantic-release automatically creates releases
-3. Versions are bumped based on commit types
-4. Packages are published to npm, PyPI, and CDN
+| File                            | Purpose                 | Scope           |
+| ------------------------------- | ----------------------- | --------------- |
+| `tsconfig.json`                 | TypeScript compilation  | Root + packages |
+| `jest.config.js`                | Test configuration      | Root + packages |
+| `.eslintrc.json`                | Linting rules           | Root + packages |
+| `.prettierrc`                   | Code formatting         | Root + packages |
+| `.npmrc`                        | npm settings            | Root            |
+| `.releaserc`                    | semantic-release config | Root            |
+| `.github/workflows/release.yml` | CI/CD pipeline          | Root            |
 
-See [Release Guide](./docs/RELEASE_GUIDE.md) for details.
+## Troubleshooting
 
-## Reporting Issues
+### TypeScript Errors
 
-### Bug Reports
+- Ensure `tsconfig.json` is valid: `npx tsc --noEmit`
+- Check for duplicate compiler options across configs
 
-Include:
+### Jest Failures
 
-- SDK and version
-- Reproduction steps
-- Expected vs actual behavior
-- Environment details
+- Run with verbose output: `npm run test:all -- --verbose`
+- Check coverage thresholds: `npm run test:all -- --coverage`
 
-### Feature Requests
+### npm Publishing Issues
 
-Include:
+- Verify npm token: `npm whoami`
+- Check 2FA settings on npm account
+- Ensure all versions are synchronized
 
-- Use case
-- Proposed API
-- Examples
+### Python SDK Issues
+
+- Verify Python version: `python --version` (requires 3.8+)
+- Check PyPI token configuration
+- Validate `pyproject.toml` syntax
 
 ## Questions?
 
-- Check [docs.devutils.in](https://docs.devutils.in)
-- Open a discussion on GitHub
-- Email support@devutils.in
-
----
-
-Thank you for contributing! 🙏
+Open an issue or contact the maintainers at support@devutils.in

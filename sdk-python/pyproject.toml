@@ -49,10 +49,13 @@ dev = [
 Homepage = "https://devutils.in"
 Repository = "https://github.com/devutils/sdks"
 Documentation = "https://docs.devutils.in"
-Issues = "https://github.com/devutils/sdk-python/issues"
+Issues = "https://github.com/devutils/sdks/issues"
 
 [tool.setuptools]
 packages = ["devutils_sdk"]
+
+[tool.setuptools.package-data]
+devutils_sdk = ["py.typed"]
 
 [tool.black]
 line-length = 100

@@ -8,10 +8,10 @@
   "homepage": "https://devutils.in",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iwilldefinitelybecoder/devutils-sdks.git"
+    "url": "https://github.com/devutils/sdks"
   },
   "bugs": {
-    "url": "https://github.com/iwilldefinitelybecoder/devutils-sdks/issues"
+    "url": "https://github.com/devutils/sdks/issues"
   },
   "workspaces": [
     "sdk-js",
@@ -21,13 +21,13 @@
     "build": "npm run build --workspace=sdk-js",
     "build:all": "npm run build:js && npm run build:python && npm run build:cdn",
     "build:js": "npm run build --workspace=sdk-js",
-    "build:python": "cd sdk-python && python -m build 2>/dev/null || echo 'Python SDK build skipped (Python not installed)'",
+    "build:python": "python -m build sdk-python 2>/dev/null || echo 'Python SDK build skipped'",
     "build:cdn": "npm run build --workspace=cdn",
     "test": "npm run test --workspace=sdk-js",
     "test:all": "npm run test:js && npm run test:cdn && npm run test:python",
     "test:js": "npm run test --workspace=sdk-js",
     "test:cdn": "npm run test --workspace=cdn",
-    "test:python": "cd sdk-python && pytest 2>/dev/null || echo 'Python tests skipped'",
+    "test:python": "python -m pytest sdk-python/tests 2>/dev/null || echo 'Python tests skipped'",
     "lint": "npm run lint --workspace=sdk-js && npm run lint --workspace=cdn",
     "format": "npm run format --workspace=sdk-js && npm run format --workspace=cdn",
     "release": "semantic-release",

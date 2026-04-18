@@ -27,9 +27,7 @@
       {
         "assets": [
           "sdk-js/package.json",
-          "sdk-js/package-lock.json",
           "sdk-python/pyproject.toml",
-          "sdk-python/setup.py",
           "cdn/package.json",
           "CHANGELOG.md"
         ],
