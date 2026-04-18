@@ -4,8 +4,7 @@ Tests all features, edge cases, and full lifecycle
 """
 
 import pytest
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 from devutils_sdk import DevUtilsSDK, DevUtilsError
 from devutils_sdk.core.http_client import HttpClient, HttpClientConfig, HttpResponse
 from devutils_sdk.core.retry_engine import retry, RetryConfig, calculate_delay
@@ -102,10 +101,9 @@ class TestScreenshot:
         """Create SDK instance"""
         return DevUtilsSDK('test-api-key')
 
-    @pytest.mark.asyncio
-    async def test_take_screenshot_with_default_options(self, sdk):
+    def test_take_screenshot_with_default_options(self, sdk):
         """Should take screenshot with default options"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {
@@ -118,7 +116,7 @@ class TestScreenshot:
                 {}
             )
 
-            result = await sdk.screenshot(
+            result = sdk.screenshot(
                 ScreenshotOptions(url='https://example.com')
             )
 
@@ -128,10 +126,9 @@ class TestScreenshot:
             assert result.width == 1280
             assert result.height == 720
 
-    @pytest.mark.asyncio
-    async def test_take_screenshot_with_custom_options(self, sdk):
+    def test_take_screenshot_with_custom_options(self, sdk):
         """Should take screenshot with custom options"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {
@@ -144,7 +141,7 @@ class TestScreenshot:
                 {}
             )
 
-            result = await sdk.screenshot(
+            result = sdk.screenshot(
                 ScreenshotOptions(
                     url='https://example.com',
                     format='jpeg',
@@ -161,33 +158,31 @@ class TestScreenshot:
             assert result.width == 1920
             assert result.height == 1080
 
-    @pytest.mark.asyncio
-    async def test_handle_screenshot_with_device_preset(self, sdk):
+    def test_handle_screenshot_with_device_preset(self, sdk):
         """Should handle screenshot with device preset"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'job-device', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.screenshot(
+            result = sdk.screenshot(
                 ScreenshotOptions(url='https://example.com', device='iPhone 12')
             )
 
             assert result.job_id == 'job-device'
 
-    @pytest.mark.asyncio
-    async def test_handle_screenshot_with_custom_headers(self, sdk):
+    def test_handle_screenshot_with_custom_headers(self, sdk):
         """Should handle screenshot with custom headers"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'job-headers', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.screenshot(
+            result = sdk.screenshot(
                 ScreenshotOptions(
                     url='https://example.com',
                     headers={'X-Custom': 'value'}
@@ -196,17 +191,16 @@ class TestScreenshot:
 
             assert result.job_id == 'job-headers'
 
-    @pytest.mark.asyncio
-    async def test_handle_screenshot_with_cookies(self, sdk):
+    def test_handle_screenshot_with_cookies(self, sdk):
         """Should handle screenshot with cookies"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'job-cookies', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.screenshot(
+            result = sdk.screenshot(
                 ScreenshotOptions(
                     url='https://example.com',
                     cookies=[{'name': 'session', 'value': 'abc123'}]
@@ -215,10 +209,9 @@ class TestScreenshot:
 
             assert result.job_id == 'job-cookies'
 
-    @pytest.mark.asyncio
-    async def test_get_screenshot_status(self, sdk):
+    def test_get_screenshot_status(self, sdk):
         """Should get screenshot status"""
-        with patch.object(sdk.http_client, 'get', new_callable=AsyncMock) as mock_get:
+        with patch.object(sdk.http_client, 'get', new_callable=MagicMock) as mock_get:
             mock_get.return_value = HttpResponse(
                 200,
                 {
@@ -229,11 +222,11 @@ class TestScreenshot:
                 {}
             )
 
-            result = await sdk.get_screenshot_status('job-123')
+            result = sdk.get_screenshot_status('job-123')
 
-            assert result.job_id == 'job-123'
-            assert result.status == 'completed'
-            assert result.image_url == 'https://cdn.example.com/image.png'
+            assert result['job_id'] == 'job-123'
+            assert result['status'] == 'completed'
+            assert result['image_url'] == 'https://cdn.example.com/image.png'
 
 
 # ============================================================================
@@ -248,32 +241,30 @@ class TestPDF:
         """Create SDK instance"""
         return DevUtilsSDK('test-api-key')
 
-    @pytest.mark.asyncio
-    async def test_generate_pdf_with_default_options(self, sdk):
+    def test_generate_pdf_with_default_options(self, sdk):
         """Should generate PDF with default options"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'pdf-123', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.pdf(PDFOptions(url='https://example.com'))
+            result = sdk.pdf(PDFOptions(url='https://example.com'))
 
             assert result.job_id == 'pdf-123'
             assert result.status == 'pending'
 
-    @pytest.mark.asyncio
-    async def test_generate_pdf_with_custom_options(self, sdk):
+    def test_generate_pdf_with_custom_options(self, sdk):
         """Should generate PDF with custom options"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'pdf-456', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.pdf(
+            result = sdk.pdf(
                 PDFOptions(
                     url='https://example.com',
                     format='Letter',
@@ -288,10 +279,9 @@ class TestPDF:
 
             assert result.job_id == 'pdf-456'
 
-    @pytest.mark.asyncio
-    async def test_get_pdf_status(self, sdk):
+    def test_get_pdf_status(self, sdk):
         """Should get PDF status"""
-        with patch.object(sdk.http_client, 'get', new_callable=AsyncMock) as mock_get:
+        with patch.object(sdk.http_client, 'get', new_callable=MagicMock) as mock_get:
             mock_get.return_value = HttpResponse(
                 200,
                 {
@@ -302,11 +292,11 @@ class TestPDF:
                 {}
             )
 
-            result = await sdk.get_pdf_status('pdf-123')
+            result = sdk.get_pdf_status('pdf-123')
 
-            assert result.job_id == 'pdf-123'
-            assert result.status == 'completed'
-            assert result.pdf_url == 'https://cdn.example.com/document.pdf'
+            assert result['job_id'] == 'pdf-123'
+            assert result['status'] == 'completed'
+            assert result['pdf_url'] == 'https://cdn.example.com/document.pdf'
 
 
 # ============================================================================
@@ -321,10 +311,9 @@ class TestReader:
         """Create SDK instance"""
         return DevUtilsSDK('test-api-key')
 
-    @pytest.mark.asyncio
-    async def test_read_content_from_url(self, sdk):
+    def test_read_content_from_url(self, sdk):
         """Should read content from URL"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {
@@ -338,7 +327,7 @@ class TestReader:
                 {}
             )
 
-            result = await sdk.reader('https://example.com')
+            result = sdk.reader('https://example.com')
 
             assert result.title == 'Example Page'
             assert result.content == 'This is the page content'
@@ -347,10 +336,9 @@ class TestReader:
             assert result.image == 'https://example.com/image.jpg'
             assert result.language == 'en'
 
-    @pytest.mark.asyncio
-    async def test_handle_missing_optional_fields(self, sdk):
+    def test_handle_missing_optional_fields(self, sdk):
         """Should handle missing optional fields"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {
@@ -360,7 +348,7 @@ class TestReader:
                 {}
             )
 
-            result = await sdk.reader('https://example.com')
+            result = sdk.reader('https://example.com')
 
             assert result.title == 'Example Page'
             assert result.content == 'This is the page content'
@@ -375,50 +363,47 @@ class TestReader:
 class TestRetryLogic:
     """Test retry logic"""
 
-    @pytest.mark.asyncio
-    async def test_retry_on_failure(self):
+    def test_retry_on_failure(self):
         """Should retry on failure"""
         attempts = 0
 
-        async def fn():
+        def fn():
             nonlocal attempts
             attempts += 1
             if attempts < 3:
                 raise DevUtilsError('TEMPORARY_ERROR', 'Temporary error')
             return 'success'
 
-        result = await retry(fn, RetryConfig(max_attempts=3, initial_delay=0.01))
+        result = retry(fn, RetryConfig(max_attempts=3, initial_delay=0.01))
 
         assert result == 'success'
         assert attempts == 3
 
-    @pytest.mark.asyncio
-    async def test_not_retry_non_retryable_errors(self):
+    def test_not_retry_non_retryable_errors(self):
         """Should not retry non-retryable errors"""
         attempts = 0
 
-        async def fn():
+        def fn():
             nonlocal attempts
             attempts += 1
             raise DevUtilsError('INVALID_API_KEY', 'Invalid key', 401)
 
         with pytest.raises(DevUtilsError):
-            await retry(fn, RetryConfig(max_attempts=3, initial_delay=0.01))
+            retry(fn, RetryConfig(max_attempts=3, initial_delay=0.01))
 
         assert attempts == 1
 
-    @pytest.mark.asyncio
-    async def test_fail_after_max_attempts(self):
+    def test_fail_after_max_attempts(self):
         """Should fail after max attempts"""
         attempts = 0
 
-        async def fn():
+        def fn():
             nonlocal attempts
             attempts += 1
             raise DevUtilsError('TEMPORARY_ERROR', 'Temporary error')
 
         with pytest.raises(DevUtilsError):
-            await retry(fn, RetryConfig(max_attempts=3, initial_delay=0.01))
+            retry(fn, RetryConfig(max_attempts=3, initial_delay=0.01))
 
         assert attempts == 3
 
@@ -460,11 +445,10 @@ class TestFullLifecycle:
         """Create SDK instance"""
         return DevUtilsSDK('test-api-key')
 
-    @pytest.mark.asyncio
-    async def test_complete_screenshot_lifecycle(self, sdk):
+    def test_complete_screenshot_lifecycle(self, sdk):
         """Should complete screenshot lifecycle"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post, \
-             patch.object(sdk.http_client, 'get', new_callable=AsyncMock) as mock_get:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post, \
+             patch.object(sdk.http_client, 'get', new_callable=MagicMock) as mock_get:
 
             # Step 1: Request screenshot
             mock_post.return_value = HttpResponse(
@@ -473,7 +457,7 @@ class TestFullLifecycle:
                 {}
             )
 
-            screenshot_result = await sdk.screenshot(
+            screenshot_result = sdk.screenshot(
                 ScreenshotOptions(url='https://example.com')
             )
             assert screenshot_result.status == 'pending'
@@ -485,8 +469,8 @@ class TestFullLifecycle:
                 {}
             )
 
-            status_result = await sdk.get_screenshot_status('job-lifecycle')
-            assert status_result.status == 'processing'
+            status_result = sdk.get_screenshot_status('job-lifecycle')
+            assert status_result['status'] == 'processing'
 
             # Step 3: Get completed result
             mock_get.return_value = HttpResponse(
@@ -499,15 +483,14 @@ class TestFullLifecycle:
                 {}
             )
 
-            status_result = await sdk.get_screenshot_status('job-lifecycle')
-            assert status_result.status == 'completed'
-            assert status_result.image_url == 'https://cdn.example.com/image.png'
+            status_result = sdk.get_screenshot_status('job-lifecycle')
+            assert status_result['status'] == 'completed'
+            assert status_result['image_url'] == 'https://cdn.example.com/image.png'
 
-    @pytest.mark.asyncio
-    async def test_complete_pdf_lifecycle(self, sdk):
+    def test_complete_pdf_lifecycle(self, sdk):
         """Should complete PDF lifecycle"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post, \
-             patch.object(sdk.http_client, 'get', new_callable=AsyncMock) as mock_get:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post, \
+             patch.object(sdk.http_client, 'get', new_callable=MagicMock) as mock_get:
 
             # Step 1: Request PDF
             mock_post.return_value = HttpResponse(
@@ -516,7 +499,7 @@ class TestFullLifecycle:
                 {}
             )
 
-            pdf_result = await sdk.pdf(PDFOptions(url='https://example.com'))
+            pdf_result = sdk.pdf(PDFOptions(url='https://example.com'))
             assert pdf_result.status == 'pending'
 
             # Step 2: Get completed result
@@ -530,27 +513,24 @@ class TestFullLifecycle:
                 {}
             )
 
-            status_result = await sdk.get_pdf_status('pdf-lifecycle')
-            assert status_result.status == 'completed'
-            assert status_result.pdf_url == 'https://cdn.example.com/document.pdf'
+            status_result = sdk.get_pdf_status('pdf-lifecycle')
+            assert status_result['status'] == 'completed'
+            assert status_result['pdf_url'] == 'https://cdn.example.com/document.pdf'
 
-    @pytest.mark.asyncio
-    async def test_handle_multiple_concurrent_requests(self, sdk):
+    def test_handle_multiple_concurrent_requests(self, sdk):
         """Should handle multiple concurrent requests"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'job-concurrent', 'status': 'pending'},
                 {}
             )
 
-            promises = [
+            results = [
                 sdk.screenshot(ScreenshotOptions(url='https://example1.com')),
                 sdk.screenshot(ScreenshotOptions(url='https://example2.com')),
                 sdk.screenshot(ScreenshotOptions(url='https://example3.com')),
             ]
-
-            results = await asyncio.gather(*promises)
 
             assert len(results) == 3
             assert all(r.job_id == 'job-concurrent' for r in results)
@@ -568,68 +548,62 @@ class TestEdgeCases:
         """Create SDK instance"""
         return DevUtilsSDK('test-api-key')
 
-    @pytest.mark.asyncio
-    async def test_handle_very_long_urls(self, sdk):
+    def test_handle_very_long_urls(self, sdk):
         """Should handle very long URLs"""
         long_url = 'https://example.com/' + 'a' * 2000
 
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'job-long-url', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.screenshot(ScreenshotOptions(url=long_url))
+            result = sdk.screenshot(ScreenshotOptions(url=long_url))
             assert result.job_id == 'job-long-url'
 
-    @pytest.mark.asyncio
-    async def test_handle_special_characters_in_url(self, sdk):
+    def test_handle_special_characters_in_url(self, sdk):
         """Should handle special characters in URL"""
         special_url = 'https://example.com/path?query=value&other=123#anchor'
 
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(
                 200,
                 {'job_id': 'job-special', 'status': 'pending'},
                 {}
             )
 
-            result = await sdk.screenshot(ScreenshotOptions(url=special_url))
+            result = sdk.screenshot(ScreenshotOptions(url=special_url))
             assert result.job_id == 'job-special'
 
-    @pytest.mark.asyncio
-    async def test_handle_empty_response_data(self, sdk):
+    def test_handle_empty_response_data(self, sdk):
         """Should handle empty response data"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.return_value = HttpResponse(200, {}, {})
 
-            result = await sdk.screenshot(ScreenshotOptions(url='https://example.com'))
+            result = sdk.screenshot(ScreenshotOptions(url='https://example.com'))
             assert result.job_id is None
 
-    @pytest.mark.asyncio
-    async def test_handle_500_server_error(self, sdk):
+    def test_handle_500_server_error(self, sdk):
         """Should handle 500 server error"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.side_effect = DevUtilsError('HTTP_ERROR', 'Server error', 500)
 
             with pytest.raises(DevUtilsError):
-                await sdk.screenshot(ScreenshotOptions(url='https://example.com'))
+                sdk.screenshot(ScreenshotOptions(url='https://example.com'))
 
-    @pytest.mark.asyncio
-    async def test_handle_429_rate_limit_error(self, sdk):
+    def test_handle_429_rate_limit_error(self, sdk):
         """Should handle 429 rate limit error"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.side_effect = DevUtilsError('RATE_LIMITED', 'Rate limited', 429)
 
             with pytest.raises(DevUtilsError):
-                await sdk.screenshot(ScreenshotOptions(url='https://example.com'))
+                sdk.screenshot(ScreenshotOptions(url='https://example.com'))
 
-    @pytest.mark.asyncio
-    async def test_handle_timeout(self, sdk):
+    def test_handle_timeout(self, sdk):
         """Should handle timeout"""
-        with patch.object(sdk.http_client, 'post', new_callable=AsyncMock) as mock_post:
+        with patch.object(sdk.http_client, 'post', new_callable=MagicMock) as mock_post:
             mock_post.side_effect = DevUtilsError('TIMEOUT', 'Request timeout')
 
             with pytest.raises(DevUtilsError):
-                await sdk.screenshot(ScreenshotOptions(url='https://example.com'))
+                sdk.screenshot(ScreenshotOptions(url='https://example.com'))

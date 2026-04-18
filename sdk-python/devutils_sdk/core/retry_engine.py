@@ -1,8 +1,7 @@
 """Retry logic for DevUtils SDK"""
 
-import asyncio
 import time
-from typing import Callable, Optional, TypeVar, Awaitable, Any
+from typing import Callable, Optional, TypeVar, Any
 from dataclasses import dataclass
 
 from .error_handler import DevUtilsError
@@ -47,19 +46,19 @@ def calculate_delay(attempt: int, config: RetryConfig) -> float:
     return delay
 
 
-async def sleep(ms: float) -> None:
-    """Async sleep"""
-    await asyncio.sleep(ms / 1000)
+def sleep(ms: float) -> None:
+    """Sleep"""
+    time.sleep(ms / 1000)
 
 
-async def retry(
-    fn: Callable[[], Awaitable[T]], config: Optional[RetryConfig] = None
+def retry(
+    fn: Callable[[], T], config: Optional[RetryConfig] = None
 ) -> T:
     """
     Retry a function with exponential backoff
 
     Args:
-        fn: Async function to retry
+        fn: Function to retry
         config: Retry configuration
 
     Returns:
@@ -73,7 +72,7 @@ async def retry(
 
     for attempt in range(config.max_attempts):
         try:
-            return await fn()
+            return fn()
         except Exception as e:
             last_error = e
 
@@ -82,13 +81,13 @@ async def retry(
 
             if attempt < config.max_attempts - 1:
                 delay = calculate_delay(attempt, config)
-                await sleep(delay)
+                sleep(delay)
 
     raise last_error or DevUtilsError("RETRY_FAILED", "All retry attempts failed")
 
 
-async def retry_with_predicate(
-    fn: Callable[[], Awaitable[T]],
+def retry_with_predicate(
+    fn: Callable[[], T],
     should_retry: Callable[[Any], bool],
     config: Optional[RetryConfig] = None,
 ) -> T:
@@ -96,7 +95,7 @@ async def retry_with_predicate(
     Retry a function with custom predicate
 
     Args:
-        fn: Async function to retry
+        fn: Function to retry
         should_retry: Function to determine if result should be retried
         config: Retry configuration
 
@@ -111,7 +110,7 @@ async def retry_with_predicate(
 
     for attempt in range(config.max_attempts):
         try:
-            result = await fn()
+            result = fn()
 
             if not should_retry(result):
                 return result
@@ -120,7 +119,7 @@ async def retry_with_predicate(
 
             if attempt < config.max_attempts - 1:
                 delay = calculate_delay(attempt, config)
-                await sleep(delay)
+                sleep(delay)
 
         except Exception as e:
             if not is_retryable(e):
@@ -128,6 +127,6 @@ async def retry_with_predicate(
 
             if attempt < config.max_attempts - 1:
                 delay = calculate_delay(attempt, config)
-                await sleep(delay)
+                sleep(delay)
 
     return last_result or DevUtilsError("RETRY_FAILED", "All retry attempts failed")

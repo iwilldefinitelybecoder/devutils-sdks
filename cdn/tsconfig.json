@@ -14,8 +14,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "declarationDir": "./dist",
     "sourceMap": true,
     "removeComments": true
   },

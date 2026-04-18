@@ -82,7 +82,7 @@ class HttpClient:
 
         return headers
 
-    async def request(
+    def request(
         self,
         method: str,
         path: str,
@@ -153,44 +153,44 @@ class HttpClient:
         except Exception as e:
             raise DevUtilsError("REQUEST_FAILED", str(e), original_error=e)
 
-    async def get(
+    def get(
         self, path: str, options: Optional[Dict[str, Any]] = None
     ) -> HttpResponse:
         """Make GET request"""
-        return await self.request("GET", path, options=options)
+        return self.request("GET", path, options=options)
 
-    async def post(
+    def post(
         self,
         path: str,
         data: Optional[Dict[str, Any]] = None,
         options: Optional[Dict[str, Any]] = None,
     ) -> HttpResponse:
         """Make POST request"""
-        return await self.request("POST", path, data=data, options=options)
+        return self.request("POST", path, data=data, options=options)
 
-    async def put(
+    def put(
         self,
         path: str,
         data: Optional[Dict[str, Any]] = None,
         options: Optional[Dict[str, Any]] = None,
     ) -> HttpResponse:
         """Make PUT request"""
-        return await self.request("PUT", path, data=data, options=options)
+        return self.request("PUT", path, data=data, options=options)
 
-    async def delete(
+    def delete(
         self, path: str, options: Optional[Dict[str, Any]] = None
     ) -> HttpResponse:
         """Make DELETE request"""
-        return await self.request("DELETE", path, options=options)
+        return self.request("DELETE", path, options=options)
 
-    async def patch(
+    def patch(
         self,
         path: str,
         data: Optional[Dict[str, Any]] = None,
         options: Optional[Dict[str, Any]] = None,
     ) -> HttpResponse:
         """Make PATCH request"""
-        return await self.request("PATCH", path, data=data, options=options)
+        return self.request("PATCH", path, data=data, options=options)
 
     def close(self):
         """Close the session"""

@@ -6,7 +6,7 @@ setup(
     name="devutils-sdk",
     version="1.0.0",
     description="Production-grade SDK for DevUtils API",
-    long_description=open("README.md").read(),
+    long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="DevUtils",
     author_email="support@devutils.in",

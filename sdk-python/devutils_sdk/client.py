@@ -32,7 +32,7 @@ class DevUtilsSDK:
         self.http_client = HttpClient(self.config)
         self.job_resolver = JobResolver()
 
-    async def screenshot(
+    def screenshot(
         self, options: ScreenshotOptions
     ) -> ScreenshotResult:
         """
@@ -63,7 +63,7 @@ class DevUtilsSDK:
         if options.headers:
             payload["headers"] = options.headers
 
-        response = await self.http_client.post("/screenshot", data=payload)
+        response = self.http_client.post("/screenshot", data=payload)
 
         return ScreenshotResult(
             job_id=response.data.get("job_id"),
@@ -76,7 +76,7 @@ class DevUtilsSDK:
             expires_at=response.data.get("expires_at"),
         )
 
-    async def pdf(self, options: PDFOptions) -> PDFResult:
+    def pdf(self, options: PDFOptions) -> PDFResult:
         """
         Generate a PDF
 
@@ -98,7 +98,7 @@ class DevUtilsSDK:
             "timeout": options.timeout,
         }
 
-        response = await self.http_client.post("/pdf", data=payload)
+        response = self.http_client.post("/pdf", data=payload)
 
         return PDFResult(
             job_id=response.data.get("job_id"),
@@ -108,7 +108,7 @@ class DevUtilsSDK:
             expires_at=response.data.get("expires_at"),
         )
 
-    async def reader(self, url: str, options: Optional[ReaderOptions] = None) -> ReaderResult:
+    def reader(self, url: str, options: Optional[ReaderOptions] = None) -> ReaderResult:
         """
         Read and parse content from URL
 
@@ -126,7 +126,7 @@ class DevUtilsSDK:
             "timeout": options.timeout,
         }
 
-        response = await self.http_client.post("/reader", data=payload)
+        response = self.http_client.post("/reader", data=payload)
 
         return ReaderResult(
             title=response.data.get("title", ""),
@@ -137,14 +137,14 @@ class DevUtilsSDK:
             language=response.data.get("language"),
         )
 
-    async def get_screenshot_status(self, job_id: str) -> dict:
+    def get_screenshot_status(self, job_id: str) -> dict:
         """Get screenshot job status"""
-        response = await self.http_client.get(f"/screenshot/{job_id}")
+        response = self.http_client.get(f"/screenshot/{job_id}")
         return response.data
 
-    async def get_pdf_status(self, job_id: str) -> dict:
+    def get_pdf_status(self, job_id: str) -> dict:
         """Get PDF job status"""
-        response = await self.http_client.get(f"/pdf/{job_id}")
+        response = self.http_client.get(f"/pdf/{job_id}")
         return response.data
 
     def close(self):

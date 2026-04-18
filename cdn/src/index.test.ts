@@ -3,13 +3,7 @@
  * Tests all features, edge cases, and full lifecycle
  */
 
-import {
-  DevUtilsSDK,
-  DevUtilsError,
-  retry,
-  sleep,
-  calculateDelay,
-} from "./index";
+import { DevUtilsSDK, DevUtilsError, retry, sleep, calculateDelay } from "./index";
 
 // ============================================================================
 // Mock Fetch
@@ -76,18 +70,10 @@ describe("DevUtilsError", () => {
     const timeoutError = new DevUtilsError("TIMEOUT", "Timeout");
     expect(timeoutError.isRetryable()).toBe(true);
 
-    const rateLimitError = new DevUtilsError(
-      "RATE_LIMITED",
-      "Rate limited",
-      429,
-    );
+    const rateLimitError = new DevUtilsError("RATE_LIMITED", "Rate limited", 429);
     expect(rateLimitError.isRetryable()).toBe(true);
 
-    const invalidKeyError = new DevUtilsError(
-      "INVALID_API_KEY",
-      "Invalid key",
-      401,
-    );
+    const invalidKeyError = new DevUtilsError("INVALID_API_KEY", "Invalid key", 401);
     expect(invalidKeyError.isRetryable()).toBe(false);
   });
 
@@ -140,9 +126,7 @@ describe("Screenshot API", () => {
   });
 
   test("should throw error if URL is missing", async () => {
-    await expect(sdk.screenshot({ url: "" })).rejects.toThrow(
-      "URL is required",
-    );
+    await expect(sdk.screenshot({ url: "" })).rejects.toThrow("URL is required");
   });
 
   test("should take screenshot with default options", async () => {
@@ -258,17 +242,15 @@ describe("Screenshot API", () => {
       data: { message: "Invalid API key" },
     };
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow(DevUtilsError);
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow(DevUtilsError);
   });
 
   test("should handle network errors", async () => {
     mockFetchError = new TypeError("Network error");
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow("CONNECTION_ERROR");
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow(
+      "CONNECTION_ERROR"
+    );
   });
 
   test("should get screenshot status", async () => {
@@ -290,9 +272,7 @@ describe("Screenshot API", () => {
   });
 
   test("should throw error if job ID is missing", async () => {
-    await expect(sdk.getScreenshotStatus("")).rejects.toThrow(
-      "Job ID is required",
-    );
+    await expect(sdk.getScreenshotStatus("")).rejects.toThrow("Job ID is required");
   });
 });
 
@@ -441,7 +421,10 @@ describe("Reader API", () => {
       },
     };
 
-    const result = await sdk.reader("https://example.com", { timeout: 60000 });
+    const result = await sdk.reader("https://example.com", {
+      url: "https://example.com",
+      timeout: 60000,
+    });
 
     expect(result.title).toBe("Example Page");
   });
@@ -477,9 +460,9 @@ describe("Retry Logic", () => {
       throw new DevUtilsError("INVALID_API_KEY", "Invalid key", 401);
     };
 
-    await expect(
-      retry(fn, { maxAttempts: 3, initialDelay: 10 }),
-    ).rejects.toThrow("INVALID_API_KEY");
+    await expect(retry(fn, { maxAttempts: 3, initialDelay: 10 })).rejects.toThrow(
+      "INVALID_API_KEY"
+    );
 
     expect(attempts).toBe(1);
   });
@@ -492,9 +475,7 @@ describe("Retry Logic", () => {
       throw new DevUtilsError("TEMPORARY_ERROR", "Temporary error");
     };
 
-    await expect(
-      retry(fn, { maxAttempts: 3, initialDelay: 10 }),
-    ).rejects.toThrow();
+    await expect(retry(fn, { maxAttempts: 3, initialDelay: 10 })).rejects.toThrow();
 
     expect(attempts).toBe(3);
   });
@@ -728,9 +709,7 @@ describe("Edge Cases", () => {
       data: { message: "Server error" },
     };
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow();
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow();
   });
 
   test("should handle 429 rate limit error", async () => {
@@ -741,18 +720,14 @@ describe("Edge Cases", () => {
       data: { message: "Rate limited" },
     };
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow();
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow();
   });
 
   test("should handle timeout", async () => {
     mockFetchError = new Error("AbortError");
     (mockFetchError as any).name = "AbortError";
 
-    await expect(
-      sdk.screenshot({ url: "https://example.com" }),
-    ).rejects.toThrow("TIMEOUT");
+    await expect(sdk.screenshot({ url: "https://example.com" })).rejects.toThrow("TIMEOUT");
   });
 
   test("should handle malformed JSON response", async () => {
