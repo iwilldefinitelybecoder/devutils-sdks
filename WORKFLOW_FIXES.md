@@ -14,18 +14,31 @@
 
 **Status**: ✅ Fixed
 
-### 2. ✅ npm Cache Issue
+### 2. ✅ npm ci Lock File Error
+
+**Problem**: "Dependencies lock file is not found" error when using `npm ci` without a package-lock.json.
+
+**Solution**:
+
+- Changed from `npm ci` to `npm install --no-save --legacy-peer-deps`
+- `--no-save` prevents modifying package.json files during CI
+- `--legacy-peer-deps` handles peer dependency conflicts gracefully
+- Works with monorepo workspaces without requiring a lock file
+
+**Status**: ✅ Fixed
+
+### 3. ✅ npm Cache Issue
 
 **Problem**: "Dependencies lock file is not found" error when cache was enabled.
 
 **Solution**:
 
 - Removed `cache: "pip"` from Python setup step
-- npm ci now runs without cache requirement (lock file is in root)
+- npm install now runs without cache requirement
 
 **Status**: ✅ Fixed
 
-### 3. ✅ Slack Notification Removed
+### 4. ✅ Slack Notification Removed
 
 **Problem**: Slack notification step was using invalid parameters and causing failures.
 
@@ -36,7 +49,7 @@
 
 **Status**: ✅ Fixed
 
-### 4. ✅ Monorepo Path Issues
+### 5. ✅ Monorepo Path Issues
 
 **Problem**: Workflow was using `working-directory: devutils_sdk` but the repo structure has the monorepo at root.
 
@@ -55,7 +68,7 @@ The workflow now:
 - ✅ Checks out code
 - ✅ Sets up Node.js 20 (Node.js 24 compatible)
 - ✅ Sets up Python 3.11
-- ✅ Installs dependencies (npm ci + pip packages)
+- ✅ Installs dependencies (npm install + pip packages)
 - ✅ Verifies commit messages
 - ✅ Builds all SDKs (JS, Python, CDN)
 - ✅ Tests all SDKs

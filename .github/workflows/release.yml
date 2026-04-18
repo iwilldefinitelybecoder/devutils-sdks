@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm install --no-save --legacy-peer-deps
           pip install build twine
 
       - name: Verify commit messages
