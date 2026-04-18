@@ -59,7 +59,7 @@ export class HttpClient {
     try {
       const response = await fetch(url, fetchOptions);
       clearTimeout(timer);
-      const responseData = await response.json();
+      const responseData = (await response.json()) as T;
 
       if (!response.ok) {
         throw { status: response.status, data: responseData };
